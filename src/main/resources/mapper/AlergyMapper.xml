@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.pmember.service.AlergyMapper">
+
+    <!-- 마스터 알레르기 전체 조회 -->
+    <select id="selectAllAlergy" resultType="com.example.pmember.dto.Alergy">
+        SELECT
+        al_idx,
+        al_name,
+        al_symptom,
+        al_severity
+        FROM p_alergy
+        ORDER BY al_idx
+    </select>
+
+    <!-- 특정 회원이 체크한 알레르기 al_idx 목록 -->
+    <select id="selectUserAlergyIdxList" parameterType="string" resultType="int">
+        SELECT
+        al_idx
+        FROM p_member_alergy
+        WHERE id = #{id}
+        ORDER BY al_idx
+    </select>
+
+    <!-- 특정 회원 알레르기 전체 삭제 -->
+    <delete id="deleteUserAlergyById" parameterType="string">
+        DELETE FROM p_member_alergy
+        WHERE id = #{id}
+    </delete>
+
+    <!-- 회원 알레르기 추가 (1건) -->
+    <insert id="insertUserAlergy" parameterType="com.example.pmember.dto.MemberAlergy">
+        INSERT INTO p_member_alergy
+        (
+        id,
+        al_idx
+        )
+        VALUES
+        (
+        #{id},
+        #{al_idx}
+        )
+    </insert>
+
+    <!-- 🔹 이 회원이 알레르기로 인해 피해야 하는 음식 이름 목록 -->
+    <select id="selectFoodNamesByMember"
+            parameterType="string"
+            resultType="string">
+        SELECT DISTINCT f.foodmenu_name
+        FROM p_member_alergy   ma       -- 회원이 체크한 알레르기
+        JOIN p_foodmenu_alergy fa
+        ON ma.al_idx = fa.al_idx      -- 같은 알레르기를 포함한 메뉴들
+        JOIN p_foodmenu        f
+        ON fa.foodmenu_idx = f.foodmenu_idx
+        WHERE ma.id = #{id}
+    </select>
+
+</mapper>

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.pmember.service.PmemberMapper">
+
+    <!-- 회원가입 -->
+    <insert id="insert" parameterType="com.example.pmember.dto.Pmember">
+        INSERT INTO p_member (
+        id, pwd, email, birthdate, gender, profile_image
+        )
+        VALUES (
+        #{id},
+        #{pw},
+        #{email},
+        STR_TO_DATE(#{birth}, '%Y-%m-%d'),
+        CASE
+        WHEN #{gender} IN ('M','F','P') THEN #{gender}
+        WHEN #{gender} = 'male'   THEN 'M'
+        WHEN #{gender} = 'female' THEN 'F'
+        ELSE 'P'
+        END,
+        #{profileImage}
+        )
+    </insert>
+
+    <!-- 로그인 조회 -->
+    <select id="findById" parameterType="string"
+            resultType="com.example.pmember.dto.Pmember">
+        SELECT
+        id,
+        pwd AS pw,
+        email,
+        DATE_FORMAT(birthdate, '%Y-%m-%d') AS birth,
+        CASE gender
+        WHEN 'M' THEN 'male'
+        WHEN 'F' THEN 'female'
+        ELSE 'private'
+        END AS gender,
+        profile_image AS profileImage
+        FROM p_member
+        WHERE id = #{id}
+        LIMIT 1
+    </select>
+
+    <!-- 아이디 존재 여부 -->
+    <select id="existsById" parameterType="string" resultType="int">
+        SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
+        FROM p_member
+        WHERE id = #{id}
+    </select>
+
+    <!-- 이메일 존재 여부 -->
+    <select id="existsByEmail" parameterType="string" resultType="int">
+        SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
+        FROM p_member
+        WHERE email = #{email}
+    </select>
+
+    <!-- 아이디 카운트 -->
+    <select id="countById" parameterType="string" resultType="int">
+        SELECT COUNT(*)
+        FROM p_member
+        WHERE id = #{id}
+    </select>
+
+    <!-- 🔹 아이디 찾기 (email + birthdate) -->
+    <select id="findIdByEmailAndBirth"
+            resultType="string">
+        SELECT id
+        FROM p_member
+        WHERE email = #{email}
+        AND birthdate = STR_TO_DATE(#{birth}, '%Y-%m-%d')
+        LIMIT 1
+    </select>
+
+    <!-- 🔹 비밀번호 재설정 -->
+    <update id="updatePassword">
+        UPDATE p_member
+        SET pwd = #{pw}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 프로필 이미지 업데이트 -->
+    <update id="updateProfileImage">
+        UPDATE p_member
+        SET profile_image = #{profileImage}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 전체 조회 -->
+    <select id="findFullById" parameterType="string"
+            resultType="com.example.pmember.dto.Pmember">
+        SELECT
+        id,
+        pwd AS pw,
+        email,
+        DATE_FORMAT(birthdate, '%Y-%m-%d') AS birth,
+        CASE gender
+        WHEN 'M' THEN 'male'
+        WHEN 'F' THEN 'female'
+        ELSE 'private'
+        END AS gender,
+        profile_image AS profileImage
+        FROM p_member
+        WHERE id = #{id}
+        LIMIT 1
+    </select>
+
+    <!-- 회원 정보 수정 (비밀번호 제외) -->
+    <update id="updateMemberNoPw" parameterType="map">
+        UPDATE p_member
+        <set>
+            id = #{member.id},
+            email = #{member.email},
+            <if test="member.birth != null and member.birth != ''">
+                birthdate = STR_TO_DATE(#{member.birth}, '%Y-%m-%d'),
+            </if>
+            gender =
+            CASE
+            WHEN #{member.gender} IN ('M','F','P') THEN #{member.gender}
+            WHEN #{member.gender} = 'male'   THEN 'M'
+            WHEN #{member.gender} = 'female' THEN 'F'
+            ELSE 'P'
+            END
+        </set>
+        WHERE id = #{oldId}
+    </update>
+
+    <!-- 회원 정보 수정 (비밀번호 포함) -->
+    <update id="updateMemberWithPw" parameterType="map">
+        UPDATE p_member
+        <set>
+            id = #{member.id},
+            pwd = #{member.pw},
+            email = #{member.email},
+            <if test="member.birth != null and member.birth != ''">
+                birthdate = STR_TO_DATE(#{member.birth}, '%Y-%m-%d'),
+            </if>
+            gender =
+            CASE
+            WHEN #{member.gender} IN ('M','F','P') THEN #{member.gender}
+            WHEN #{member.gender} = 'male'   THEN 'M'
+            WHEN #{member.gender} = 'female' THEN 'F'
+            ELSE 'P'
+            END
+        </set>
+        WHERE id = #{oldId}
+    </update>
+
+</mapper>

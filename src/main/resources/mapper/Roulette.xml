@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.pmember.service.RouletteMapper">
+
+    <resultMap id="RouletteMap" type="com.example.pmember.dto.Roulette">
+        <id     column="foodmenu_idx"      property="foodmenuIdx"/>
+        <result column="foodmenu_name"     property="foodmenuName"/>
+        <result column="category"          property="category"/>
+        <result column="main_yn"           property="mainYn"/>
+        <result column="side_ingredients"  property="sideIngredients"/>
+        <result column="temp"              property="temp"/>
+        <result column="recipe"            property="recipe"/>
+        <result column="hot_level"         property="hotLevel"/>
+        <result column="created_at"        property="createdAt"/>
+        <result column="foodmenu_image"    property="foodmenuImage"/>
+    </resultMap>
+
+    <!-- ✅ 기존: 카테고리에서 랜덤 1개 -->
+    <select id="selectRandomByCategory" resultMap="RouletteMap">
+        SELECT
+        foodmenu_idx, foodmenu_name, category, main_yn,
+        side_ingredients, temp, recipe, hot_level,
+        created_at, foodmenu_image
+        FROM p_foodmenu
+        WHERE category = #{category}
+        ORDER BY RAND()
+        LIMIT 1
+    </select>
+
+    <!-- ✅ 기존: 전체에서 랜덤 1개 -->
+    <select id="selectRandomAny" resultMap="RouletteMap">
+        SELECT
+        foodmenu_idx, foodmenu_name, category, main_yn,
+        side_ingredients, temp, recipe, hot_level,
+        created_at, foodmenu_image
+        FROM p_foodmenu
+        ORDER BY RAND()
+        LIMIT 1
+    </select>
+
+    <!-- 🔹 새로 추가: 카테고리 + blockList 제외 랜덤 -->
+    <select id="selectRandomByCategoryExcept"
+            parameterType="map"
+            resultMap="RouletteMap">
+        SELECT
+        foodmenu_idx, foodmenu_name, category, main_yn,
+        side_ingredients, temp, recipe, hot_level,
+        created_at, foodmenu_image
+        FROM p_foodmenu
+        WHERE category = #{category}
+        <if test="blockList != null and blockList.size() > 0">
+            AND foodmenu_name NOT IN
+            <foreach collection="blockList" item="name"
+                     open="(" separator="," close=")">
+                #{name}
+            </foreach>
+        </if>
+        ORDER BY RAND()
+        LIMIT 1
+    </select>
+
+    <!-- 🔹 새로 추가: 전체 + blockList 제외 랜덤 -->
+    <select id="selectRandomAnyExcept"
+            parameterType="map"
+            resultMap="RouletteMap">
+        SELECT
+        foodmenu_idx, foodmenu_name, category, main_yn,
+        side_ingredients, temp, recipe, hot_level,
+        created_at, foodmenu_image
+        FROM p_foodmenu
+        WHERE 1 = 1
+        <if test="blockList != null and blockList.size() > 0">
+            AND foodmenu_name NOT IN
+            <foreach collection="blockList" item="name"
+                     open="(" separator="," close=")">
+                #{name}
+            </foreach>
+        </if>
+        ORDER BY RAND()
+        LIMIT 1
+    </select>
+
+</mapper>

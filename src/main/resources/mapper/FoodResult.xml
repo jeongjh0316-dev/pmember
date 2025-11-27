@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.pmember.service.FoodResultMapper">
+
+    <!-- ✅ DB 컬럼 → DTO 필드 매핑 -->
+    <resultMap id="FoodResultMap" type="com.example.pmember.dto.FoodResult">
+        <id     property="foodmenuIdx"   column="foodmenu_idx"/>
+        <result property="foodmenuName"  column="foodmenu_name"/>
+        <result property="foodmenuImage" column="foodmenu_image"/>
+        <result property="score"         column="score"/>
+    </resultMap>
+
+    <!-- ✅ (옵션) 예전 테스트용: 그냥 앞의 3개 메뉴 가져오기 -->
+    <select id="selectTopResults" resultMap="FoodResultMap">
+        SELECT
+        foodmenu_idx,
+        foodmenu_name,
+        foodmenu_image,
+        0.0 AS score
+        FROM p_foodmenu
+        ORDER BY foodmenu_idx
+        LIMIT 3
+    </select>
+
+    <!-- ✅ Flask 추천 결과(메뉴 이름 리스트)로 DB에서 이미지/정보 조회
+         + 로그인 회원의 알레르기(p_member_alergy)와 겹치는 메뉴는 제외 -->
+    <select id="selectByNames" resultMap="FoodResultMap">
+        SELECT
+        f.foodmenu_idx,
+        f.foodmenu_name,
+        f.foodmenu_image,
+        0.0 AS score
+        FROM p_foodmenu f
+        WHERE f.foodmenu_name IN
+        <foreach collection="names" item="name" open="(" separator="," close=")">
+            #{name}
+        </foreach>
+
+        <!-- 🔹 memberId가 있을 때만 알레르기 필터 적용 (게스트면 그냥 패스) -->
+        <if test="memberId != null and memberId != ''">
+            AND NOT EXISTS (
+            SELECT 1
+            FROM p_foodmenu_alergy fa
+            JOIN p_member_alergy ma
+            ON fa.al_idx = ma.al_idx
+            WHERE fa.foodmenu_idx = f.foodmenu_idx
+            AND ma.id = #{memberId}
+            )
+        </if>
+    </select>
+
+</mapper>

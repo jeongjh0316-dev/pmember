@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.pmember.service.BeverageResultMapper">
+
+    <!-- DB → BeverageResult DTO 매핑 -->
+    <resultMap id="BeverageResultMap" type="com.example.pmember.dto.BeverageResult">
+        <id    property="id"        column="beveragemenu_idx"/>
+        <result property="name"     column="beveragemenu_name"/>
+        <result property="imageUrl" column="beveragemenu_image"/>
+    </resultMap>
+
+    <!-- Flask가 넘긴 menu_name 리스트로 음료 조회 -->
+    <select id="findByMenuNames" resultMap="BeverageResultMap">
+        SELECT
+        beveragemenu_idx,
+        beveragemenu_name,
+        beveragemenu_image
+        FROM p_beveragemenu
+        WHERE beveragemenu_name IN
+        <foreach collection="names"
+                 item="name"
+                 open="("
+                 separator=","
+                 close=")">
+            #{name}
+        </foreach>
+        ORDER BY FIELD(
+        beveragemenu_name,
+        <foreach collection="names"
+                 item="name"
+                 separator=",">
+            #{name}
+        </foreach>
+        )
+    </select>
+
+</mapper>

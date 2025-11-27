@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.pmember.service.FoodRecommendationMapper">
+
+    <!-- 음식 추천 결과 기록: id + foodmenu_idx 리스트로 여러 건 INSERT -->
+    <insert id="insertFoodRecommendations">
+        INSERT INTO p_food_recommendation (id, foodmenu_idx)
+        VALUES
+        <foreach collection="menuIdxList" item="idx" separator=",">
+            (#{id}, #{idx})
+        </foreach>
+    </insert>
+
+    <!-- 마이페이지: 최근 음식 추천 기록 조회 (p_foodmenu 조인해서 이름/이미지까지 가져오기) -->
+    <select id="findRecentFoodRecommendations"
+            parameterType="string"
+            resultType="com.example.pmember.dto.FoodRecommendation">
+        SELECT
+        r.reco_idx           AS recoIdx,
+        r.id                 AS id,
+        r.foodmenu_idx       AS foodmenuIdx,
+        r.foodmenu_ratings   AS foodmenuRatings,
+        r.created_at         AS createdAt,
+        f.foodmenu_name      AS foodmenuName,
+        -- ⭐ 이미지 컬럼 (파일명) → DTO.foodmenuImage
+        f.foodmenu_image     AS foodmenuImage
+        FROM p_food_recommendation r
+        JOIN p_foodmenu f
+        ON r.foodmenu_idx = f.foodmenu_idx
+        WHERE r.id = #{id}
+        <!-- 🔑 최신 추천 묶음부터, 묶음 안에서는 1등→2등→3등 -->
+        ORDER BY r.created_at DESC, r.reco_idx ASC
+        LIMIT 21
+    </select>
+
+    <!-- 마이페이지: 선택한 reco_idx들 삭제 -->
+    <delete id="deleteFoodRecommendations">
+        DELETE FROM p_food_recommendation
+        WHERE id = #{id}
+        AND reco_idx IN
+        <foreach collection="recoIdxList" item="reco" open="(" separator="," close=")">
+            #{reco}
+        </foreach>
+    </delete>
+
+</mapper>

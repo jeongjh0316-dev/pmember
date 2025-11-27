@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.pmember.service.RatingMapper">
+
+    <!-- 🔹 음식 별점: 음식 이름으로 foodmenu_idx 찾고 기록테이블에 INSERT -->
+    <insert id="insertFoodRating">
+        INSERT INTO p_food_recommendation (id, foodmenu_idx, foodmenu_ratings)
+        SELECT
+        #{id},
+        f.foodmenu_idx,
+        #{rating}
+        FROM p_foodmenu f
+        WHERE f.foodmenu_name = #{foodName}
+        LIMIT 1
+    </insert>
+
+    <!-- 🔹 음료 별점: 음료 이름으로 beveragemenu_idx 찾고 기록테이블에 INSERT -->
+    <insert id="insertBeverageRating">
+        INSERT INTO p_beveragemenu_recommendation (id, beveragemenu_idx, beveragemenu_ratings)
+        SELECT
+        #{id},
+        b.beveragemenu_idx,
+        #{rating}
+        FROM p_beveragemenu b
+        WHERE b.beveragemenu_name = #{beverageName}
+        LIMIT 1
+    </insert>
+
+</mapper>

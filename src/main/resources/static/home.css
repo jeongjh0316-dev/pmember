@@ -1,0 +1,176 @@
+:root {
+  --bg: #faf8f6;
+  --panel: #ffffff;
+  --text: #222;
+  --muted: #8a8f98;
+  --brand: #6f46ff;
+  --brand-light: #f5f0ff;
+  --border: #e2e8f0;
+  --pill: #fff4e8;
+  --accent: #ff7a00;
+  --shadow: 0 6px 16px rgba(0, 0, 0, .08);
+
+  /* ✅ recommand.jsp와 완전 동일한 폭/여백 */
+  --container-max: 1060px; /* nav, wrap 동일 */
+  --gutter-x: 20px;        /* 좌우 패딩 */
+  --section-y: clamp(24px, 5vh, 48px);
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; padding: 0; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Noto Sans KR", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ✅ 이모지 폰트 고정 */
+.emoji {
+  font-family: "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji","Noto Emoji",
+               "Segoe UI Symbol","Noto Sans KR",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif !important;
+  font-weight: 400 !important;
+  font-size: 64px;
+  line-height: 1;
+  display: inline-block;
+}
+
+/* ===== 상단 네비 (recommand 동일) ===== */
+.nav {
+  position: sticky;
+  top: 0;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  z-index: 10;
+}
+.nav-inner {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 14px var(--gutter-x); /* 14px 20px */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nav-brand {
+  font-weight: 900;
+  letter-spacing: -0.2px;
+  font-size: 18px;
+}
+
+/* 로그아웃 버튼 */
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 14px;
+  background: #fff;
+  color: #222;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  box-shadow: var(--shadow);
+  transition: all .2s;
+  cursor: pointer;
+}
+.logout-btn:hover { box-shadow: 0 8px 20px rgba(0, 0, 0, .12); transform: translateY(-1px); }
+.logout-btn:active { transform: translateY(0); }
+.logout-btn svg { width: 16px; height: 16px; stroke-width: 2.2; }
+
+/* ===== 본문 래퍼 (recommand 동일) ===== */
+.wrap {
+  max-width: var(--container-max);
+  margin: 22px auto 80px;
+  padding: 0 var(--gutter-x); /* 0 20px */
+}
+
+/* ===== 퀵 네비 (recommand 완전 동일 값) ===== */
+.quick-nav-wrap{
+  width: 100%;
+  margin: 4px 0 18px;
+  padding: 10px 12px;
+  background: #fff;                /* panel과 동일이지만 recommand는 #fff로 명시 */
+  border-radius: 18px;
+  border: none;                    /* recommand는 테두리 없음 */
+  box-shadow: 0 8px 22px rgba(0,0,0,.06);
+}
+.quick-nav{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 34px;
+  place-items: center;
+}
+.qitem{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 24px;
+  border-radius: 16px;
+  text-decoration: none;
+  color: #111;
+  font-weight: 700;
+  transition: background .2s, transform .05s;
+  min-width: 140px; /* 폭 들쭉 방지 */
+}
+.qitem:hover { background: #fff9f1; }
+.qitem:active { transform: translateY(1px); }
+.qitem.active { background: var(--pill); color: var(--accent); }
+.qitem .icon { width: 22px; height: 22px; display: block; }
+.qitem .label { font-size: 12px; color: #111; text-decoration: none; }
+
+/* ===== 홈 전용(카드 등) — 기존 유지, 필요시만 수정 ===== */
+.title {
+  text-align: center;
+  margin: calc(var(--section-y) * 0.8) 0 12px;
+  font-weight: 900;
+  font-size: clamp(26px, 4vw, 32px);
+  letter-spacing: -0.3px;
+}
+.subtitle {
+  text-align: center;
+  color: var(--muted);
+  margin-bottom: calc(var(--section-y) * 1.2);
+  font-weight: 500;
+  line-height: 1.5;
+}
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(24px, 4vw, 36px);
+}
+.category-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: clamp(48px, 6vw, 72px) 24px clamp(60px, 7vw, 80px);
+  min-height: clamp(200px, 28vh, 240px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  text-decoration: none;
+  color: inherit;
+  transition: all .25s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .06);
+}
+.category-card:hover {
+  border-color: var(--brand);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, .12);
+  transform: translateY(-6px);
+}
+.category-icon {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 40px;
+  margin-bottom: 18px;
+  font-weight: 400;
+}
+.category-card:nth-child(1) .category-icon { background: #ffe8cc; }
+.category-card:nth-child(2) .category-icon { background: #d6eaff; }
+.category-title { font-weight: 900; font-size: 23px; margin: 6px 0 8px; }
+.category-desc { color: var(--muted); font-size: 14.5px; line-height: 1.5; }

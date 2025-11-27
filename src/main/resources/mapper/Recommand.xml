@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.pmember.mapper.RouletteMapper">
+    <sql id="cols">
+        foodmenu_idx, foodmenu_name, category, main_yn, side_ingredients,
+        temp, recipe, hot_level, created_at, foodmenu_image
+    </sql>
+
+    <select id="selectRandomByCategory" parameterType="string" resultType="com.example.pmember.dto.Roulette">
+        SELECT <include refid="cols"/>
+        FROM p_foodmenu
+        WHERE 1=1
+        <if test="_parameter != null and _parameter != ''">
+            AND category = #{category}
+        </if>
+        ORDER BY RAND() LIMIT 1
+    </select>
+</mapper>

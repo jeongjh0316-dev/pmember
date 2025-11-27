@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.pmember.service.BeverageRecommendationMapper">
+
+    <!-- 음료 추천 결과 기록: id + beveragemenu_idx 리스트로 여러 건 INSERT -->
+    <insert id="insertBeverageRecommendations">
+        INSERT INTO p_beveragemenu_recommendation (id, beveragemenu_idx)
+        VALUES
+        <foreach collection="menuIdxList" item="idx" separator=",">
+            (#{id}, #{idx})
+        </foreach>
+    </insert>
+
+    <!-- 마이페이지: 최근 음료 추천 기록 조회 (p_beveragemenu 조인) -->
+    <select id="findRecentBeverageRecommendations"
+            parameterType="string"
+            resultType="com.example.pmember.dto.BeverageRecommendation">
+        SELECT
+        r.reco_bev_idx          AS recoBevIdx,
+        r.id                    AS id,
+        r.beveragemenu_idx      AS beveragemenuIdx,
+        r.beveragemenu_ratings  AS beveragemenuRatings,
+        r.created_at            AS createdAt,
+        b.beveragemenu_name     AS beveragemenuName,
+        -- ⭐ 이미지 컬럼 (파일명) → DTO.beveragemenuImage
+        b.beveragemenu_image    AS beveragemenuImage
+        FROM p_beveragemenu_recommendation r
+        JOIN p_beveragemenu b
+        ON r.beveragemenu_idx = b.beveragemenu_idx
+        WHERE r.id = #{id}
+        <!-- 🔑 최신 추천 묶음부터, 묶음 안에서는 1등→2등→3등 -->
+        ORDER BY r.created_at DESC, r.reco_bev_idx ASC
+        LIMIT 21
+    </select>
+
+    <!-- 마이페이지: 선택한 reco_bev_idx들 삭제 -->
+    <delete id="deleteBeverageRecommendations">
+        DELETE FROM p_beveragemenu_recommendation
+        WHERE id = #{id}
+        AND reco_bev_idx IN
+        <foreach collection="recoIdxList" item="reco" open="(" separator="," close=")">
+            #{reco}
+        </foreach>
+    </delete>
+
+</mapper>
