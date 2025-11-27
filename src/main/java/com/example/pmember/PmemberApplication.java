@@ -20,4 +20,4 @@ public class PmemberApplication {
     }
 }
 
-//  http://localhost:8089/
+//  http://localhost:8089/login
